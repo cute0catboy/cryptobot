@@ -11,6 +11,13 @@ from datetime import datetime
 dp = Dispatcher()
 eu_flag = "\U0001F1EA\U0001F1FA"
 
+def get_time():
+    now = datetime.now()
+    time_day = now.strftime("%d.%m.%Y")
+    time_hours = now.strftime("%H:%M:%S")
+
+    return (time_day, time_hours)
+
 def user_info(message: types.Message):
 
     print(f"id={message.from_user.id}")
@@ -51,9 +58,9 @@ async def command_btc(message: types.Message):
     price = get_price("the-open-network")
     safe_price = str(price).replace(".", r"\.")
 
-    now = datetime.now()
-    formatted_date_time_day = now.strftime("%d.%m.%Y")
-    formatted_date_time_time = now.strftime("%H:%M:%S")
+    now = get_time()
+    formatted_date_time_day = now[0]
+    formatted_date_time_time = now[1]
 
     text = markdown.text(
         f"Current TON to USDT course{eu_flag}: \n",
@@ -75,9 +82,9 @@ async def command_btc(message: types.Message):
     price = get_price("bitcoin")
     safe_price = str(price).replace(".", r"\.")
 
-    now = datetime.now()
-    formatted_date_time_day = now.strftime("%d.%m.%Y")
-    formatted_date_time_time = now.strftime("%H:%M:%S")
+    now = get_time()
+    formatted_date_time_day = now[0]
+    formatted_date_time_time = now[1]
 
     text = markdown.text(
         f"Current BTC to USDT course{eu_flag}: \n",
@@ -99,9 +106,9 @@ async def command_btc(message: types.Message):
     price = get_price("ethereum")
     safe_price = str(price).replace(".", r"\.")
 
-    now = datetime.now()
-    formatted_date_time_day = now.strftime("%d.%m.%Y")
-    formatted_date_time_time = now.strftime("%H:%M:%S")
+    now = get_time()
+    formatted_date_time_day = now[0]
+    formatted_date_time_time = now[1]
 
     text = markdown.text(
         f"Current ETH to USDT course{eu_flag}: \n",
