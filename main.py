@@ -42,6 +42,7 @@ def command_course(message: types.Message, coin: str) -> str:
     price_hour = get_price_inpast(coin, "h")
     time.sleep(10)
     price_day = get_price_inpast(coin, "d")
+    time.sleep(10)
 
     change_h = round(price - price_hour, 4)
     change_d = round(price - price_day, 4)
@@ -136,13 +137,7 @@ async def command_ton(message: types.Message):
 
 @dp.message()
 async def echo(message: types.Message):
-
     user_info(message)
-
-    try:
-      await message.send_copy(chat_id=message.chat.id)
-    except TypeError:
-        await message.reply(text="smth new")
 
 def get_price(coin: str):
     url = "https://api.coingecko.com/api/v3/simple/price"
