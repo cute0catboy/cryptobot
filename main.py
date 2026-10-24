@@ -48,7 +48,7 @@ async def command_btc(message: types.Message):
 
     user_info(message)
 
-    price = get_ton_price()
+    price = get_price("the-open-network")
     safe_price = str(price).replace(".", r"\.")
 
     now = datetime.now()
@@ -72,7 +72,7 @@ async def command_btc(message: types.Message):
 
     user_info(message)
 
-    price = get_bitcoin_price()
+    price = get_price("bitcoin")
     safe_price = str(price).replace(".", r"\.")
 
     now = datetime.now()
@@ -96,7 +96,7 @@ async def command_btc(message: types.Message):
 
     user_info(message)
 
-    price = get_eth_price()
+    price = get_price("ethereum")
     safe_price = str(price).replace(".", r"\.")
 
     now = datetime.now()
@@ -160,47 +160,16 @@ async def echo(message: types.Message):
 #
 # =====================================================================
 
-
-def get_bitcoin_price():
+def get_price(coin: str):
     url = "https://api.coingecko.com/api/v3/simple/price"
-    params = {"ids": "bitcoin", "vs_currencies": "usd"}
+    params = {f"ids": {coin}, "vs_currencies": "usd"}
 
     try:
         response = requests.get(url, params=params, timeout=10)
         response.raise_for_status() 
         data = response.json()
 
-        price = data["bitcoin"]["usd"]
-        return f"{price}"
-    except Exception as e:
-        print(f"Ошибка при получении данных: {e}")
-        return "Nan"
-
-def get_eth_price():
-    url = "https://api.coingecko.com/api/v3/simple/price"
-    params = {"ids": "ethereum", "vs_currencies": "usd"}
-
-    try:
-        response = requests.get(url, params=params, timeout=10)
-        response.raise_for_status() 
-        data = response.json()
-
-        price = data["ethereum"]["usd"]
-        return f"{price}"
-    except Exception as e:
-        print(f"Ошибка при получении данных: {e}")
-        return "Nan"
-
-def get_ton_price():
-    url = "https://api.coingecko.com/api/v3/simple/price"
-    params = {"ids": "the-open-network", "vs_currencies": "usd"}
-
-    try:
-        response = requests.get(url, params=params, timeout=10)
-        response.raise_for_status() 
-        data = response.json()
-
-        price = data["the-open-network"]["usd"]
+        price = data[coin]["usd"]
         return f"{price}"
     except Exception as e:
         print(f"Ошибка при получении данных: {e}")
