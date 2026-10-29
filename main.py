@@ -1,8 +1,7 @@
-from aiogram import Bot, Dispatcher, types
+from aiogram import Bot, Dispatcher, types, html
 import asyncio
 import logging
 from aiogram.filters import CommandStart, Command
-from aiogram.utils import markdown
 from aiogram.enums import ParseMode
 import config 
 import core
@@ -14,7 +13,12 @@ owner_id = config.Owner_id
 @dp.message(CommandStart())
 async def command_start(message: types.Message):
 
-    text = f"Hi, {markdown.hbold(message.from_user.username)}! /help to know more"
+    text = (
+        f"Hi, <b>{message.from_user.username}</b>!\n"
+        f"<blockquote>"
+        f"{html.quote("/help to know more")}"
+        f"</blockquote>"
+    )
         
     await message.answer(
         text=text,
@@ -25,17 +29,18 @@ async def command_start(message: types.Message):
     await message.bot.send_message(chat_id=owner_id,
                                    text=log_text)
 
-@dp.message(Command("help"))
+@dp.message(Command("help", prefix="!%/")) #префикс потому что прикольно
 async def command_help(message: types.Message):
 
-    text = markdown.text(
-        markdown.markdown_decoration.italic(markdown.markdown_decoration.quote(f"Crypto-helper(especially for euroteam{eu_flag}{eu_flag})")),
-        markdown.markdown_decoration.quote("/btc to get bitcoin-usdt course"),
-        markdown.markdown_decoration.quote("/eth to get ethereum-usdt course"),
-        markdown.markdown_decoration.quote("/ton to get ton-usdt course"),
-        sep="\n"
+    text = (
+        f"<i>{html.quote(f"Crypto-helper(especially for euroteam{eu_flag})")}</i>\n"
+        f"<blockquote>"
+        f"{html.quote("/btc to get bitcoin-usdt course")}\n"
+        f"{html.quote("/eth to get ethereum-usdt course")}\n"
+        f"{html.quote("/ton to get ton-usdt course")}\n"
+        f"</blockquote>"
     )
-    await message.answer(text=text, parse_mode=ParseMode.MARKDOWN_V2)
+    await message.answer(text=text, parse_mode=ParseMode.HTML)
 
     log_text = core.user_info(message)
 
