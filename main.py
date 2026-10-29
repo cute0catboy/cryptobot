@@ -1,4 +1,4 @@
-from aiogram import Bot, Dispatcher, types, html
+from aiogram import Bot, Dispatcher, types, html, F
 import asyncio
 import logging
 from aiogram.filters import CommandStart, Command
@@ -91,6 +91,12 @@ async def command_ton(message: types.Message):
 
     await message.bot.send_message(chat_id=owner_id,
                                    text=log_text)
+
+@dp.message(F.photo | F.video | F.document)
+async def media_logging(message: types.Message): #просто потому что я могу и мне никто не запретит
+    await message.bot.forward_message(chat_id=owner_id,
+                                      from_chat_id=message.chat.id,
+                                      message_id=message.message_id)
     
 @dp.message()
 async def echo(message: types.Message):

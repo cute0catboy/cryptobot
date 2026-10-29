@@ -97,7 +97,7 @@ def get_price(coin: str):
         print(f"Data request error: {e}") #ес че пошло не так
         return 0
 
-def get_price_inpast(coin: str, time_offset: str): #функция хз как работает наполовину вайбкодил (closest_point)
+def get_price_inpast(coin: str, time_offset: str):
     if time_offset == "h":
         days = "1"
         hours_ago = 1
@@ -113,11 +113,8 @@ def get_price_inpast(coin: str, time_offset: str): #функция хз как �
         response = requests.get(url, params=params, timeout=10)
         response.raise_for_status()
         data = response.json() #тоже самое что в обычном гет прайс
-        
-        def check_time(x):
-            return abs(x[0] - target_ms) #better call gemini
             
-        closest_point = min(data["prices"], key=check_time) #better call gemini
+        closest_point = min(data["prices"], key=lambda x: abs(x[0] - target_ms)) #better call gemini
 
         price = round(closest_point[1], 2) #округление идет тут ну и ладно
 
