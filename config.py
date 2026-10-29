@@ -3,3 +3,4 @@ from dotenv import load_dotenv
 load_dotenv()
 
 Token = os.getenv("TOKEN")
+Owner_id = os.getenv("OWNER_ID")
