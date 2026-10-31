@@ -1,8 +1,7 @@
-from datetime import datetime
-from aiogram.utils import markdown
 from aiogram import types, html
 import time
 import requests
+import time_module, io_module
 eu_flag = "\U0001F1EA\U0001F1FA" #колхозный метод получения флага ес
 
 def coin_formating(coin: str) -> str:
@@ -13,31 +12,25 @@ def coin_formating(coin: str) -> str:
 
     return coin #возвращает коин именно в виде для написания в command_course
 
-def get_time() -> tuple:
-    now = datetime.now()
-    time_day = now.strftime("%d.%m.%Y")
-    time_hours = now.strftime("%H:%M:%S")
-
-    return (time_day, time_hours) #("29.10.2026", "15:56:08")
-
 def user_info(message: types.Message) -> str:
 
-    text = markdown.text(
-        f"id={message.from_user.id}",
-        f"first_name={message.from_user.first_name}",
-        f"username={message.from_user.username}",
-        f"text={message.text}",
-        sep="\n"
+    text = (
+        f"message_id={message.message_id}\n"
+        f"user_id={message.from_user.id}\n"
+        f"first_name={message.from_user.first_name}\n"
+        f"username={message.from_user.username}\n"
+        f"text={message.text}"
     )
 
-    print(f"id={message.from_user.id}")
-    print(f"first_name={message.from_user.first_name}")
-    print(f"username={message.from_user.username}")
-    print(f"text={message.text}")
+    html.quote(text)
+
+    print(text)
 
     return text #возвращает все это чтобы потом скинуть в чат овнеру бота
 
-def command_course(coin: str) -> str:
+def command_course(message: types.Message, coin: str) -> str:
+
+    time_get = time_module.TimeGet()
 
     price = get_price(coin)
     time.sleep(10)
@@ -52,24 +45,43 @@ def command_course(coin: str) -> str:
     change_h_str = f"+{change_h}" if change_h >= 0 else f"{change_h}"
     change_d_str = f"+{change_d}" if change_d >= 0 else f"{change_d}" #ставит плюс(или нет) к изменению цены, для внешнего вида
 
-    coin = coin_formating(coin)  #коин в формате для пользователя
+    coin_user = coin_formating(coin)  #коин в формате для пользователя
 
-    coin_safe = html.quote(coin)
+    coin_safe = html.quote(coin_user)
     price_safe = html.quote(str(price))
     price_hour_safe = html.quote(str(price_hour))
     price_day_safe = html.quote(str(price_day))
     change_h_safe = html.quote(change_h_str)
     change_d_safe = html.quote(change_d_str) #тут просто куоте всех переменных с припиской _safe
 
-    now = get_time()
-    formatted_date_time_day = html.quote(str(now[0]))
-    formatted_date_time_time = html.quote(str(now[1])) #тоже прост форматирование но теперь времени
+    current = time_get.current
+    hour_ago = time_get.hour
+    day_ago = time_get.day
+
+    data = io_module.OneRequestStorage(
+        coin_user,
+        message.from_user.id,
+
+        price_safe,
+        current,
+
+        price_hour_safe,
+        hour_ago,
+
+        price_day_safe,
+        day_ago
+    )
+
+    io_module.write_data(data)
+
+    formatted_current_day = html.quote(str(current[0]))
+    formatted_current_time = html.quote(str(current[1])) #тоже прост форматирование но теперь времени
 
     text = (
         f"Current {coin_safe} to USDT course{eu_flag}: \n"
         f"<b>{price_safe}$</b>\n"
-        f"<i>day: {formatted_date_time_day}</i>\n"
-        f"<i>time: {formatted_date_time_time}</i>\n\n"
+        f"<i>day: {formatted_current_day}</i>\n"
+        f"<i>time: {formatted_current_time}</i>\n\n"
         f"<blockquote>"
         f"Hour ago: \n"
         f" <b>{price_hour_safe}$</b>\n"

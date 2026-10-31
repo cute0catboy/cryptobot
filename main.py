@@ -1,12 +1,14 @@
 from aiogram import Bot, Dispatcher, types, html, F
 import asyncio
+import io
 import logging
 from aiogram.filters import CommandStart, Command
 from aiogram.enums import ParseMode
 from aiogram.client.default import DefaultBotProperties
-import config 
-import core
+from aiogram.types import BufferedInputFile
+import config, core, io_module
 from pathlib import Path
+import pandas as pd
 
 DATA = Path(__file__).parent.resolve() / "data"
 
@@ -58,12 +60,10 @@ async def command_ton(message: types.Message):
 
     await message.reply(text="Wait up to 30 seconds...")
 
-    text = core.command_course("the-open-network")
-
+    text = core.command_course(message, "the-open-network")
     await message.reply(text=text)
 
     log_text = core.user_info(message)
-
     await message.bot.send_message(
         chat_id=owner_id,
         text=log_text
@@ -74,12 +74,10 @@ async def command_btc(message: types.Message):
 
     await message.reply(text="Wait up to 30 seconds...")
 
-    text = core.command_course("bitcoin")
-
+    text = core.command_course(message, "bitcoin")
     await message.reply(text=text)
 
     log_text = core.user_info(message)
-
     await message.bot.send_message(
         chat_id=owner_id,
         text=log_text
@@ -90,12 +88,36 @@ async def command_eth(message: types.Message):
 
     await message.reply(text="Wait up to 30 seconds...")
 
-    text = core.command_course("ethereum")
-
+    text = core.command_course(message, "ethereum")
     await message.reply(text=text)
 
     log_text = core.user_info(message)
+    await message.bot.send_message(
+        chat_id=owner_id,
+        text=log_text
+        )
 
+@dp.message(Command("story"))
+async def command_story(message: types.Message):
+
+    res = io_module.read_data(message.from_user.id)
+    if res[0] == 0:
+        await message.reply(
+            text=html.quote(res[1])
+        )
+        return
+    file = io.BytesIO()
+    with pd.ExcelWriter(file, engine='openpyxl') as writer:
+        res[2].to_excel(writer, index=False)
+    file.seek(0)
+
+    document = BufferedInputFile(file.read(), filename=f"{message.from_user.username}_story.xlsx")
+
+    await message.reply_document(
+        document=document,
+        caption=html.quote(res[1]))
+
+    log_text = core.user_info(message)
     await message.bot.send_message(
         chat_id=owner_id,
         text=log_text
@@ -119,7 +141,7 @@ async def command_secret_cat(message: types.Message):
 @dp.message(Command("pussy", prefix="!")) #второй кот под кодовым названием "киска"
 async def command_pussy_cat(message: types.Message):
 
-    photo_cat = DATA / "cat_scared.jpeg"
+    photo_cat = DATA / "97110_50709.jpg"
     await message.reply_photo(
         photo=types.FSInputFile(
             path = photo_cat
