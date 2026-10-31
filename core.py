@@ -68,9 +68,9 @@ def command_course(coin: str) -> str:
     text = (
         f"Current {coin_safe} to USDT course{eu_flag}: \n"
         f"<b>{price_safe}$</b>\n"
-        f"<blockquote>"
         f"<i>day: {formatted_date_time_day}</i>\n"
         f"<i>time: {formatted_date_time_time}</i>\n\n"
+        f"<blockquote>"
         f"Hour ago: \n"
         f" <b>{price_hour_safe}$</b>\n"
         f" Difference: {change_h_safe}$\n\n"
