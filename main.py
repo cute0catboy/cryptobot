@@ -6,6 +6,9 @@ from aiogram.enums import ParseMode
 from aiogram.client.default import DefaultBotProperties
 import config 
 import core
+from pathlib import Path
+
+DATA = Path(__file__).parent.resolve() / "data"
 
 dp = Dispatcher()
 eu_flag = "\U0001F1EA\U0001F1FA"
@@ -21,7 +24,7 @@ async def command_start(message: types.Message):
         f"</blockquote>"
     )
         
-    await message.answer(text=text)
+    await message.reply(text=text)
 
     log_text = core.user_info(message)
 
@@ -41,7 +44,7 @@ async def command_help(message: types.Message):
         f"{html.quote("/ton to get ton-usdt course")}\n"
         f"</blockquote>"
     )
-    await message.answer(text=text)
+    await message.reply(text=text)
 
     log_text = core.user_info(message)
 
@@ -57,7 +60,7 @@ async def command_ton(message: types.Message):
 
     text = core.command_course("the-open-network")
 
-    await message.answer(text=text)
+    await message.reply(text=text)
 
     log_text = core.user_info(message)
 
@@ -73,7 +76,7 @@ async def command_btc(message: types.Message):
 
     text = core.command_course("bitcoin")
 
-    await message.answer(text=text)
+    await message.reply(text=text)
 
     log_text = core.user_info(message)
 
@@ -89,7 +92,7 @@ async def command_eth(message: types.Message):
 
     text = core.command_course("ethereum")
 
-    await message.answer(text=text)
+    await message.reply(text=text)
 
     log_text = core.user_info(message)
 
@@ -104,6 +107,23 @@ async def command_secret_cat(message: types.Message):
     await message.reply_photo(
         photo=url,
         caption=f"<b>{html.quote("Happy Halloween!!!")}</b>"
+        )
+    
+    log_text = core.user_info(message)
+
+    await message.bot.send_message(
+        chat_id=owner_id,
+        text=log_text
+        )
+
+@dp.message(Command("pussy", prefix="!")) #второй кот под кодовым названием "киска"
+async def command_pussy_cat(message: types.Message):
+
+    photo_cat = DATA / "cat_scared.jpeg"
+    await message.reply_photo(
+        photo=types.FSInputFile(
+            path = photo_cat
+        )
         )
     
     log_text = core.user_info(message)
