@@ -19,12 +19,12 @@ main.py(только действия бота):
 
 core.py(всякие бизнес функции):
 <blockquote>
-    coin_formating(coin: str) -> str: форматирует коин в подходящее для вывода имя
-    user_info(message: types.Message) -> str: пишет инфу о сообщении в бот, возвращает ее как стринг
-    def command_course(message: types.Message, coin: str) -> str: возвращает текст для команды о курсе валюты, кидает инфу для записи в io_module, достает все цены и тд короче пиздец нагруженный класс ч его потом распилю на части я скорее всего даже отдельный модуль сделаю
-    get_price_inpast(coin: str, time_offset: list) -> list: получает цену за прошлое, в списке указать сколько часов назад (0-47, там ток 2 дня грузится но 48 мб тоже я не проверял)
-    более полное описание в комментах в самом файле core.py
-    def get_price_json(url, params): просто возвращает данные о цене в формате джсон
+ #1.   coin_formating(coin: str) -> str: форматирует коин в подходящее для вывода имя
+ #2.   user_info(message: types.Message) -> str: пишет инфу о сообщении в бот, возвращает ее как стринг
+ #3.   def command_course(message: types.Message, coin: str) -> str: возвращает текст для команды о курсе валюты, кидает инфу для записи в io_module, достает все цены и тд короче пиздец нагруженный класс ч его потом распилю на части я скорее всего даже отдельный модуль сделаю
+ #4.   get_price_inpast(coin: str, time_offset: list) -> list: получает цену за прошлое, в списке указать сколько часов назад (0-47, там ток 2 дня грузится но 48 мб тоже я не проверял)
+ #5.   более полное описание в комментах в самом файле core.py
+ #6.   def get_price_json(url, params): просто возвращает данные о цене в формате джсон
 </blockquote>
 
 time_module.py:
@@ -33,32 +33,32 @@ class TimeGet и там все эти значения временные для
 io_module.py
 <blockquote>
 
-#    @dataclass
-#    class OneRequestStorage:
-#        coin: str
-#        id: int
-#
-#        price: str
-#        time: tuple
-#        ns_time: int
-#
-#        price_hour: str
-#        time_hour: tuple
-#        ns_time_hour: int
-#
-#        price_day: str
-#        time_day: tuple
-#        ns_time_day: int
+    @dataclass
+    class OneRequestStorage:
+        coin: str
+        id: int
+
+        price: str
+        time: tuple
+        ns_time: int
+
+        price_hour: str
+        time_hour: tuple
+        ns_time_hour: int
+
+        price_day: str
+        time_day: tuple
+        ns_time_day: int
 </blockquote>
 все крутится вокруг этого датакласса
 
 <blockquote>
-#    df = pd.DataFrame(columns=[
-#        "price",
-#        "time",
-#        "date",
-#        "ns"
-#        ])
+    df = pd.DataFrame(columns=[
+        "price",
+        "time",
+        "date",
+        "ns"
+        ])
 </blockquote>
 и вокруг этого датафрейма, там легко разобраться
 
