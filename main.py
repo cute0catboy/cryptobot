@@ -1,18 +1,17 @@
 from aiogram import Bot, Dispatcher, types, html, F
 import asyncio
-import io
 import logging
 from aiogram.filters import CommandStart, Command
 from aiogram.enums import ParseMode, ChatAction
 from aiogram.client.default import DefaultBotProperties
-from aiogram.types import BufferedInputFile
+from aiogram.types import InputMediaDocument, FSInputFile
 import config, core, io_module
 from pathlib import Path
-import pandas as pd
 
 DATA = Path(__file__).parent.resolve() / "data"
 
 dp = Dispatcher()
+up_arrow = "\u2B06\uFE0F"
 eu_flag = "\U0001F1EA\U0001F1FA"
 owner_id = config.Owner_id
 
@@ -58,7 +57,8 @@ async def command_help(message: types.Message):
 @dp.message(Command("ton"))
 async def command_ton(message: types.Message):
 
-    await message.reply(text="Wait up to 30 seconds...")
+    await message.bot.send_chat_action(chat_id=message.chat.id,
+                                       action=ChatAction.TYPING)
 
     text = core.command_course(message, "the-open-network")
     await message.reply(text=text)
@@ -72,7 +72,8 @@ async def command_ton(message: types.Message):
 @dp.message(Command("btc"))
 async def command_btc(message: types.Message):
 
-    await message.reply(text="Wait up to 30 seconds...")
+    await message.bot.send_chat_action(chat_id=message.chat.id,
+                                       action=ChatAction.TYPING)
 
     text = core.command_course(message, "bitcoin")
     await message.reply(text=text)
@@ -86,7 +87,8 @@ async def command_btc(message: types.Message):
 @dp.message(Command("eth"))
 async def command_eth(message: types.Message):
 
-    await message.reply(text="Wait up to 30 seconds...")
+    await message.bot.send_chat_action(chat_id=message.chat.id,
+                                       action=ChatAction.TYPING)
 
     text = core.command_course(message, "ethereum")
     await message.reply(text=text)
@@ -103,22 +105,29 @@ async def command_story(message: types.Message):
     await message.bot.send_chat_action(chat_id=message.chat.id,
                                        action=ChatAction.TYPING)
 
-    res = io_module.read_data(message.from_user.id)
-    if res[0] == 0:
+    USER_DIR = DATA / f"user_{message.from_user.id}"
+    if not USER_DIR.is_dir():
         await message.reply(
-            text=html.quote(res[1])
+            text=html.quote("You have no history yet :(")
         )
         return
-    file = io.BytesIO()
-    with pd.ExcelWriter(file, engine='openpyxl') as writer:
-        res[2].to_excel(writer, index=False)
-    file.seek(0)
 
-    document = BufferedInputFile(file.read(), filename=f"{message.from_user.first_name}_story.xlsx")
+    files = [f for f in USER_DIR.iterdir() if f.is_file() and f.name.endswith("_DATA.xlsx")] #все нужные хлсх файлы из директории юзера в фсинпутфайл
+    files = io_module.parse(files)
+    files = [FSInputFile(path=f, filename=f.name) for f in files] 
+    media = [InputMediaDocument(media=f) for f in files]
 
-    await message.reply_document(
-        document=document,
-        caption=html.quote(res[1]))
+
+    if len(media) < 2:
+        await message.reply_document(document=files[0])
+    else:
+        await message.reply_media_group(
+            media=media
+        )
+
+    await message.answer(
+        text=html.quote(f"Your request history {up_arrow}")
+    )
 
     log_text = core.user_info(message)
     await message.bot.send_message(
@@ -141,8 +150,6 @@ async def command_secret_cat(message: types.Message):
         text=log_text
         )
 
-@dp.message(Command("pussy", prefix="!")) #второй кот под кодовым названием "киска"
-async def command_pussy_cat(message: types.Message):
 
     photo_cat = DATA / "97110_50709.jpg"
     await message.reply_photo(

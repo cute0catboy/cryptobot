@@ -32,12 +32,10 @@ def command_course(message: types.Message, coin: str) -> str:
 
     time_get = time_module.TimeGet()
 
-    price = get_price(coin)
-    time.sleep(10)
-    price_hour = get_price_inpast(coin, "h")
-    time.sleep(10)
-    price_day = get_price_inpast(coin, "d")
-    time.sleep(10) #получает цены со слипом потому что там на апи лимит на бесплатные запросы
+    prices = get_price_inpast(coin, [0,1,24])
+    price = prices[0]
+    price_hour = prices[1]
+    price_day = prices[2]
 
     change_h = round(price - price_hour, 4)
     change_d = round(price - price_day, 4) #округление цены до нормального вида
@@ -54,6 +52,10 @@ def command_course(message: types.Message, coin: str) -> str:
     change_h_safe = html.quote(change_h_str)
     change_d_safe = html.quote(change_d_str) #тут просто куоте всех переменных с припиской _safe
 
+    ns_time = time_get.ns_time
+    ns_time_hour = time_get.ns_time_hour
+    ns_time_day = time_get.ns_time_day
+
     current = time_get.current
     hour_ago = time_get.hour
     day_ago = time_get.day
@@ -64,12 +66,16 @@ def command_course(message: types.Message, coin: str) -> str:
 
         price_safe,
         current,
+        ns_time,
 
         price_hour_safe,
         hour_ago,
+        ns_time_hour,
 
         price_day_safe,
-        day_ago
+        day_ago,
+        ns_time_day
+
     )
 
     io_module.write_data(data)
@@ -94,44 +100,29 @@ def command_course(message: types.Message, coin: str) -> str:
     
     return text
 
-def get_price(coin: str):
-    url = "https://api.coingecko.com/api/v3/simple/price"
-    params = {f"ids": {coin}, "vs_currencies": "usd"}
-
-    try:
-        response = requests.get(url, params=params, timeout=10) #запрос данных с коингеко апи, к сожалению блокировка для нищих есть
-        response.raise_for_status() 
-        data = response.json() #вся инфа в json экспортится. надо сделать чтобы она сохранялась, типо можно получить все свои предыдущие запросы.
-
-        price = data[coin]["usd"] #отношение цены коин-юсд
-        return price
-    except Exception as e:
-        print(f"Data request error: {e}") #ес че пошло не так
-        return 0
-
-def get_price_inpast(coin: str, time_offset: str):
-    if time_offset == "h":
-        days = "1"
-        hours_ago = 1
-    else:
-        days = "2"
-        hours_ago = 24 #конвертация, колхозно
-
-    target_ms = (time.time() - (hours_ago * 3600)) * 1000
-    url = f"https://api.coingecko.com/api/v3/coins/{coin}/market_chart"
-    params = {"vs_currency": "usd", "days": days} #к параметрам прибавляется колво дней за которые надо скачать данные
-    
+def get_price_json(url, params):
     try:
         response = requests.get(url, params=params, timeout=10)
         response.raise_for_status()
-        data = response.json() #тоже самое что в обычном гет прайс
-            
-        closest_point = min(data["prices"], key=lambda x: abs(x[0] - target_ms)) #better call gemini
-
-        price = round(closest_point[1], 2) #округление идет тут ну и ладно
-
-        return price
-        
+        return response.json()
     except Exception as e:
         print(f"Data request error: {e}")
-        return 0
+        return None
+
+def get_price_inpast(coin: str, hours_ago: list):
+    target_ms = [(time.time() - (h * 3600)) * 1000 for h in hours_ago]
+    url = f"https://api.coingecko.com/api/v3/coins/{coin}/market_chart"
+    params = {"vs_currency": "usd", "days": "2"} #к параметрам прибавляется колво дней за которые надо скачать данные
+    result = []
+    
+    data = get_price_json(url, params)
+    if data == None:
+        return [0,0,0]
+    
+    for ms in target_ms:
+        closest_point = min(data["prices"], key=lambda x: abs(x[0] - ms)) #better call gemini
+        price = round(closest_point[1], 2) #округление идет тут ну и ладно
+        result.append(price)
+
+    return result
+        
