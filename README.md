@@ -28,33 +28,35 @@ def get_price_json(url, params): просто возвращает данные 
 time_module.py:
 class TimeGet и там все эти значения временные для текущего времени час назад денб назад (потом переделаю под неопределенное время)
 
-io_module.py
-@dataclass
-class OneRequestStorage:
-    coin: str
-    id: int
+<blockquote>
+    io_module.py
+    @dataclass
+    class OneRequestStorage:
+        coin: str
+        id: int
 
-    price: str
-    time: tuple
-    ns_time: int
+        price: str
+        time: tuple
+        ns_time: int
 
-    price_hour: str
-    time_hour: tuple
-    ns_time_hour: int
+        price_hour: str
+        time_hour: tuple
+        ns_time_hour: int
 
-    price_day: str
-    time_day: tuple
-    ns_time_day: int
-
+        price_day: str
+        time_day: tuple
+        ns_time_day: int
+</blockquote>
 все крутится вокруг этого датакласса
 
-df = pd.DataFrame(columns=[
-    "price",
-    "time",
-    "date",
-    "ns"
-    ])
-
+<blockquote>
+    df = pd.DataFrame(columns=[
+        "price",
+        "time",
+        "date",
+        "ns"
+        ])
+</blockquote>
 и вокруг этого датафрейма, там легко разобраться
 
 чтобы запустить своего бота нужно создать в папке .env файл и в нем написать
@@ -93,3 +95,8 @@ OWNER_ID=ид аккаунта для логов
  "dogecoin"                  - Dogecoin (DOGE)
  "shiba-inu"                 - Shiba Inu (SHIB)
  "pepe"                      - Pepe (PEPE)
+
+заметки на будущее:
+1. переделать command_course и все вот это разветвление на день - час - текущий момент. (возможно просто создать датакласс которым буду как из пулемета ебашить)
+2. распилить command_course
+3. большое обновление, уже после 1 и 2 ну и еще мб какой рефактор. добавить генерацию курса как фотку (перед этим pillow или чо там надо)
