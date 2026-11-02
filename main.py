@@ -97,7 +97,7 @@ async def command_eth(message: types.Message):
         text=log_text
         )
 
-@dp.message(Command("story"))
+@dp.message(Command("story")) #потом добавлю формат истории типо в хлсх или текстом
 async def command_story(message: types.Message):
 
     res = io_module.read_data(message.from_user.id)
@@ -111,7 +111,7 @@ async def command_story(message: types.Message):
         res[2].to_excel(writer, index=False)
     file.seek(0)
 
-    document = BufferedInputFile(file.read(), filename=f"{message.from_user.username}_story.xlsx")
+    document = BufferedInputFile(file.read(), filename=f"{message.from_user.first_name}_story.xlsx")
 
     await message.reply_document(
         document=document,
