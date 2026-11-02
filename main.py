@@ -3,7 +3,7 @@ import asyncio
 import io
 import logging
 from aiogram.filters import CommandStart, Command
-from aiogram.enums import ParseMode
+from aiogram.enums import ParseMode, ChatAction
 from aiogram.client.default import DefaultBotProperties
 from aiogram.types import BufferedInputFile
 import config, core, io_module
@@ -99,6 +99,9 @@ async def command_eth(message: types.Message):
 
 @dp.message(Command("story")) #потом добавлю формат истории типо в хлсх или текстом
 async def command_story(message: types.Message):
+
+    await message.bot.send_chat_action(chat_id=message.chat.id,
+                                       action=ChatAction.TYPING)
 
     res = io_module.read_data(message.from_user.id)
     if res[0] == 0:
