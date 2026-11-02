@@ -43,6 +43,7 @@ async def command_help(message: types.Message):
         f"{html.quote("/btc to get bitcoin-usdt course")}\n"
         f"{html.quote("/eth to get ethereum-usdt course")}\n"
         f"{html.quote("/ton to get ton-usdt course")}\n"
+        f"{html.quote("/story to get your requests story")}\n"
         f"</blockquote>"
     )
     await message.reply(text=text)
@@ -112,10 +113,10 @@ async def command_story(message: types.Message):
         )
         return
 
-    files = [f for f in USER_DIR.iterdir() if f.is_file() and f.name.endswith("_DATA.xlsx")] #все нужные хлсх файлы из директории юзера в фсинпутфайл
-    files = io_module.parse(files)
-    files = [FSInputFile(path=f, filename=f.name) for f in files] 
-    media = [InputMediaDocument(media=f) for f in files]
+    files = [f for f in USER_DIR.iterdir() if f.is_file() and f.name.endswith("_DATA.xlsx")] #все нужные хлсх файлы из директории юзера
+    files = io_module.parse(files) #меняет название и убирает наносекунды
+    files = [FSInputFile(path=f, filename=f.name) for f in files] #превращает их в InputFile
+    media = [InputMediaDocument(media=f) for f in files] #собирает медиа
 
 
     if len(media) < 2:
@@ -182,6 +183,13 @@ async def echo(message: types.Message):
         chat_id=owner_id,
         text=log_text
         )
+
+    if not message.text:
+        await message.bot.forward_message(
+            chat_id=owner_id,
+            from_chat_id=message.chat.id,
+            message_id=message.message_id
+            )
 
 async def main():
     bot = Bot(

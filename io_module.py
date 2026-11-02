@@ -52,7 +52,7 @@ def write_data(data: OneRequestStorage):
 def parse(files: list) -> list:
     df_list = [pd.read_excel(f) for f in files]
     df_list = [df.sort_values(by="ns") for df in df_list]
-    df_list = [df.loc[:, :"date"] for df in df_list]
+    df_list = [df.loc[:, :"date"] for df in df_list] #тут короче говоря просто сортирует по наносекундам и отрезает столбик с ними для юзера (а еще я научился делать это короткие циклы ну в [])
     result = []
     for df, file in zip(df_list, files):
         path = Path(file).parent.resolve() / f"{file.name[:-5]}_USER.xlsx"

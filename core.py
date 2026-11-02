@@ -32,7 +32,7 @@ def command_course(message: types.Message, coin: str) -> str:
 
     time_get = time_module.TimeGet()
 
-    prices = get_price_inpast(coin, [0,1,24])
+    prices = get_price_inpast(coin, [0,1,24]) 
     price = prices[0]
     price_hour = prices[1]
     price_day = prices[2]
@@ -109,19 +109,19 @@ def get_price_json(url, params):
         print(f"Data request error: {e}")
         return None
 
-def get_price_inpast(coin: str, hours_ago: list):
-    target_ms = [(time.time() - (h * 3600)) * 1000 for h in hours_ago]
+def get_price_inpast(coin: str, hours_ago: list): # я эту функцию полностью переработал, я раньше изза того что ее навайбкодил не понимал как она работает и хуячил по 3 реквеста на команду
+    target_ms = [(time.time() - (h * 3600)) * 1000 for h in hours_ago] 
     url = f"https://api.coingecko.com/api/v3/coins/{coin}/market_chart"
     params = {"vs_currency": "usd", "days": "2"} #к параметрам прибавляется колво дней за которые надо скачать данные
     result = []
     
     data = get_price_json(url, params)
     if data == None:
-        return [0,0,0]
+        return [0]*len(hours_ago)
     
     for ms in target_ms:
-        closest_point = min(data["prices"], key=lambda x: abs(x[0] - ms)) #better call gemini
-        price = round(closest_point[1], 2) #округление идет тут ну и ладно
+        closest_point = min(data["prices"], key=lambda x: abs(x[0] - ms)) #better call gemini птмш я хз как этот джсон устроен потом разберусь
+        price = round(closest_point[1], 2) 
         result.append(price)
 
     return result
