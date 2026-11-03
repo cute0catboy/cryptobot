@@ -1,5 +1,12 @@
 from datetime import datetime, timedelta
 import time
+from dataclasses import dataclass
+
+@dataclass
+class Time:
+    nanoseconds: int
+    time: str
+    date: str
 
 class TimeGet:
 
@@ -7,21 +14,20 @@ class TimeGet:
         self.ns_in_hour = 3_600_000_000_000
         self.now = self.get_now()
 
-        self.ns_time = time.time_ns()
-        self.ns_time_hour = time.time_ns() - self.ns_in_hour
-        self.ns_time_day = time.time_ns() - self.ns_in_hour*24
-
-        self.current = self.getdeltatime(0)
-        self.hour = self.getdeltatime(1)
-        self.day = self.getdeltatime(24)
-
-    def get_time(self, h: int) -> tuple: #скорее всего единственная функция которая в будущем тут останется неизменной, остальные по любому переделаю
-        return (time.time_ns() - self.ns_in_hour * h, self.getdeltatime(h)) 
+    def get_time(self, h: int) -> Time: #скорее всего единственная функция которая в будущем тут останется неизменной, остальные по любому переделаю
+        hh = self.getdeltatime_time(h)
+        dd = self.getdeltatime_date(h)
+        nn = time.time_ns() - self.ns_in_hour * h
+        return Time(nn, hh, dd)
         # (nanoseconds, (date, time))
 
     def get_now(self) -> datetime:
         return datetime.now()
 
-    def getdeltatime(self, h: int) -> tuple:
+    def getdeltatime_time(self, h: int) -> str:
         delta = self.now - timedelta(hours=h)
-        return (delta.strftime("%d.%m.%Y"), delta.strftime("%H:%M:%S"))
+        return delta.strftime("%H:%M:%S")
+
+    def getdeltatime_date(self, h: int) -> str:
+        delta = self.now - timedelta(hours=h)
+        return delta.strftime("%d.%m.%Y")

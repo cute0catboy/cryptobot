@@ -9,18 +9,18 @@ class OneRequestStorage:
     coin: str
     id: int
 
-    price: str
-    time: tuple
-    ns_time: int
+    price: list #[100.5, 151.3, 157.2, ...]
+    time: list #[time_module.Time, time_module.Time, time_module.Time,...]
 
-    price_hour: str
-    time_hour: tuple
-    ns_time_hour: int
-
-    price_day: str
-    time_day: tuple
-    ns_time_day: int
-
+    def __post_init__(self):
+        self.time_hours = []
+        self.time_days = []
+        self.time_nanosec = []
+        for t in self.time:
+            self.time_days.append(t.date)
+            self.time_hours.append(t.time)
+            self.time_nanosec.append(t.nanoseconds)
+ 
 def write_data(data: OneRequestStorage):
 
     directory = DATA / f'user_{data.id}'
@@ -39,10 +39,10 @@ def write_data(data: OneRequestStorage):
         df = pd.read_excel(file_path)
 
     new_row = pd.DataFrame({
-        "price": [data.price_day, data.price_hour, data.price],
-        "time": [data.time_day[1], data.time_hour[1], data.time[1]],
-        "date": [data.time_day[0], data.time_hour[0], data.time[0]],
-        "ns": [data.ns_time_day, data.ns_time_hour, data.ns_time]
+        "price": data.price,
+        "time": data.time_hours,
+        "date": data.time_days,
+        "ns": data.time_nanosec
         })
 
     df = pd.concat([df, new_row], ignore_index=True)

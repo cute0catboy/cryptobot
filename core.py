@@ -37,55 +37,36 @@ def command_course(message: types.Message, coin: str, times: list) -> str:
     time_get = time_module.TimeGet()
     prices = get_price_inpast(coin, times)
     coin_user = coin_formating(coin)  #коин в формате для пользователя 
+    time_out = []
     text = (
         f"{html.quote(f"{coin_user} to USDT course{eu_flag}: ")}"
         f"\n"
         f"<blockquote>"
     )
-    for hour, price in zip(times, prices):
+    for hour, price in zip(times, prices): #цикловый сборщик текста
         time_string = "current price" if hour == 0 else f"{hour} hour(s) ago"
-        only_time = time_get.get_time(h=hour)
+        only_time = time_get.get_time(hour)
+        time_out.append(only_time)
         text = text + (
             f"<b>{html.quote(f"price: {price}$")}</b>"
             f"\n"
             f"<b>{html.quote(time_string)}</b>"
             f"\n"
-            f"<i>{html.quote(f"time: {only_time[1][1]}\ndate: {only_time[1][0]}\n")}</i>"
+            f"<i>{html.quote(f"time: {only_time.time}\ndate: {only_time.date}\n")}</i>"
             f"\n\n"
         )
     text = text + (f"</blockquote>")
-
-    #---------------------------------- выше этого коммента новая структура, потом полностью заменю старую но щас она еще нужна
         
-
-    ns_time = time_get.ns_time
-    ns_time_hour = time_get.ns_time_hour
-    ns_time_day = time_get.ns_time_day
-
-    current = time_get.current
-    hour_ago = time_get.hour
-    day_ago = time_get.day
-
     data = io_module.OneRequestStorage(
         coin_user,
         message.from_user.id,
 
-        prices[0],
-        current,
-        ns_time,
-
-        prices[1],
-        hour_ago,
-        ns_time_hour,
-
-        prices[2],
-        day_ago,
-        ns_time_day
-
+        prices,
+        time_out
     )
 
     io_module.write_data(data)
-    return text
+    return text #короче я вторую часть обновления доделал, но мне капец как кажется что тут баг на баге
 
 def get_price_json(url, params):
     try:
