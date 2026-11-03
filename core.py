@@ -8,13 +8,18 @@ def get_change(price1: float, price2: float):
     change = round(price1 - price2, 2)
     return f"+{change}$" if change >= 0 else f"{change}$"
 
-def coin_formating(coin: str) -> str:
+def coin_formating(coin: str, r: int) -> str:
 
-    coin = "TON" if coin == "the-open-network" else coin 
-    coin = "BTC" if coin == "bitcoin" else coin
-    coin = "ETH" if coin == "ethereum" else coin
+    if r == 0:
+        coin = "TON" if coin == "the-open-network" else coin 
+        coin = "BTC" if coin == "bitcoin" else coin
+        coin = "ETH" if coin == "ethereum" else coin
+    else:
+        coin = "the-open-network" if coin.lower() == "ton" else coin 
+        coin = "bitcoin" if coin.lower() == "btc"else coin
+        coin = "ethereum" if coin.lower() == "eth" else coin
 
-    return coin #возвращает коин именно в виде для написания в command_course
+    return coin
 
 def user_info(message: types.Message) -> str:
 
@@ -36,7 +41,7 @@ def command_course(message: types.Message, coin: str, times: list) -> str:
 
     time_get = time_module.TimeGet()
     prices = get_price_inpast(coin, times)
-    coin_user = coin_formating(coin)  #коин в формате для пользователя 
+    coin_user = coin_formating(coin, 0)  #коин в формате для пользователя 
     time_out = []
     text = (
         f"{html.quote(f"{coin_user} to USDT course{eu_flag}: ")}"

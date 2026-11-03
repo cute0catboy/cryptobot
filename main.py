@@ -1,7 +1,7 @@
 from aiogram import Bot, Dispatcher, types, html, F
 import asyncio
 import logging
-from aiogram.filters import CommandStart, Command
+from aiogram.filters import CommandStart, Command, CommandObject
 from aiogram.enums import ParseMode, ChatAction
 from aiogram.client.default import DefaultBotProperties
 from aiogram.types import InputMediaDocument, FSInputFile
@@ -55,43 +55,14 @@ async def command_help(message: types.Message):
         text=log_text
         )
 
-@dp.message(Command("ton"))
-async def command_ton(message: types.Message):
+@dp.message(Command(commands=["eth", "btc", "ton"]))
+async def command_eth(message: types.Message, command: CommandObject):
 
     await message.bot.send_chat_action(chat_id=message.chat.id,
                                        action=ChatAction.TYPING)
 
-    text = core.command_course(message, "the-open-network", [0,1,24])
-    await message.reply(text=text)
-
-    log_text = core.user_info(message)
-    await message.bot.send_message(
-        chat_id=owner_id,
-        text=log_text
-        )
-
-@dp.message(Command("btc"))
-async def command_btc(message: types.Message):
-
-    await message.bot.send_chat_action(chat_id=message.chat.id,
-                                       action=ChatAction.TYPING)
-
-    text = core.command_course(message, "bitcoin", [0,1,24])
-    await message.reply(text=text)
-
-    log_text = core.user_info(message)
-    await message.bot.send_message(
-        chat_id=owner_id,
-        text=log_text
-        )
-
-@dp.message(Command("eth"))
-async def command_eth(message: types.Message):
-
-    await message.bot.send_chat_action(chat_id=message.chat.id,
-                                       action=ChatAction.TYPING)
-
-    text = core.command_course(message, "ethereum", [0,1,24])
+    coin = core.coin_formating(command.command, 1)
+    text = core.command_course(message, coin, [0,1,24])
     await message.reply(text=text)
 
     log_text = core.user_info(message)
