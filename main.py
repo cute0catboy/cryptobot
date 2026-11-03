@@ -61,7 +61,7 @@ async def command_ton(message: types.Message):
     await message.bot.send_chat_action(chat_id=message.chat.id,
                                        action=ChatAction.TYPING)
 
-    text = core.command_course(message, "the-open-network")
+    text = core.command_course(message, "the-open-network", [0,1,24])
     await message.reply(text=text)
 
     log_text = core.user_info(message)
@@ -76,7 +76,7 @@ async def command_btc(message: types.Message):
     await message.bot.send_chat_action(chat_id=message.chat.id,
                                        action=ChatAction.TYPING)
 
-    text = core.command_course(message, "bitcoin")
+    text = core.command_course(message, "bitcoin", [0,1,24])
     await message.reply(text=text)
 
     log_text = core.user_info(message)
@@ -91,7 +91,7 @@ async def command_eth(message: types.Message):
     await message.bot.send_chat_action(chat_id=message.chat.id,
                                        action=ChatAction.TYPING)
 
-    text = core.command_course(message, "ethereum")
+    text = core.command_course(message, "ethereum", [0,1,24])
     await message.reply(text=text)
 
     log_text = core.user_info(message)

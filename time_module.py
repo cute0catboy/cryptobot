@@ -15,6 +15,10 @@ class TimeGet:
         self.hour = self.getdeltatime(1)
         self.day = self.getdeltatime(24)
 
+    def get_time(self, h: int) -> tuple: #скорее всего единственная функция которая в будущем тут останется неизменной, остальные по любому переделаю
+        return (time.time_ns() - self.ns_in_hour * h, self.getdeltatime(h)) 
+        # (nanoseconds, (date, time))
+
     def get_now(self) -> datetime:
         return datetime.now()
 

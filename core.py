@@ -4,6 +4,10 @@ import requests
 import time_module, io_module
 eu_flag = "\U0001F1EA\U0001F1FA" #колхозный метод получения флага ес
 
+def get_change(price1: float, price2: float):
+    change = round(price1 - price2, 2)
+    return f"+{change}$" if change >= 0 else f"{change}$"
+
 def coin_formating(coin: str) -> str:
 
     coin = "TON" if coin == "the-open-network" else coin 
@@ -28,29 +32,31 @@ def user_info(message: types.Message) -> str:
 
     return text #возвращает все это чтобы потом скинуть в чат овнеру бота
 
-def command_course(message: types.Message, coin: str) -> str:
+def command_course(message: types.Message, coin: str, times: list) -> str:
 
     time_get = time_module.TimeGet()
+    prices = get_price_inpast(coin, times)
+    coin_user = coin_formating(coin)  #коин в формате для пользователя 
+    text = (
+        f"{html.quote(f"{coin_user} to USDT course{eu_flag}: ")}"
+        f"\n"
+        f"<blockquote>"
+    )
+    for hour, price in zip(times, prices):
+        time_string = "current price" if hour == 0 else f"{hour} hour(s) ago"
+        only_time = time_get.get_time(h=hour)
+        text = text + (
+            f"<b>{html.quote(f"price: {price}$")}</b>"
+            f"\n"
+            f"<b>{html.quote(time_string)}</b>"
+            f"\n"
+            f"<i>{html.quote(f"time: {only_time[1][1]}\ndate: {only_time[1][0]}\n")}</i>"
+            f"\n\n"
+        )
+    text = text + (f"</blockquote>")
 
-    prices = get_price_inpast(coin, [0,1,24]) 
-    price = prices[0]
-    price_hour = prices[1]
-    price_day = prices[2]
-
-    change_h = round(price - price_hour, 4)
-    change_d = round(price - price_day, 4) #округление цены до нормального вида
-
-    change_h_str = f"+{change_h}" if change_h >= 0 else f"{change_h}"
-    change_d_str = f"+{change_d}" if change_d >= 0 else f"{change_d}" #ставит плюс(или нет) к изменению цены, для внешнего вида
-
-    coin_user = coin_formating(coin)  #коин в формате для пользователя
-
-    coin_safe = html.quote(coin_user)
-    price_safe = html.quote(str(price))
-    price_hour_safe = html.quote(str(price_hour))
-    price_day_safe = html.quote(str(price_day))
-    change_h_safe = html.quote(change_h_str)
-    change_d_safe = html.quote(change_d_str) #тут просто куоте всех переменных с припиской _safe
+    #---------------------------------- выше этого коммента новая структура, потом полностью заменю старую но щас она еще нужна
+        
 
     ns_time = time_get.ns_time
     ns_time_hour = time_get.ns_time_hour
@@ -64,40 +70,21 @@ def command_course(message: types.Message, coin: str) -> str:
         coin_user,
         message.from_user.id,
 
-        price_safe,
+        prices[0],
         current,
         ns_time,
 
-        price_hour_safe,
+        prices[1],
         hour_ago,
         ns_time_hour,
 
-        price_day_safe,
+        prices[2],
         day_ago,
         ns_time_day
 
     )
 
     io_module.write_data(data)
-
-    formatted_current_day = html.quote(str(current[0]))
-    formatted_current_time = html.quote(str(current[1])) #тоже прост форматирование но теперь времени
-
-    text = (
-        f"Current {coin_safe} to USDT course{eu_flag}: \n"
-        f"<b>{price_safe}$</b>\n"
-        f"<i>day: {formatted_current_day}</i>\n"
-        f"<i>time: {formatted_current_time}</i>\n\n"
-        f"<blockquote>"
-        f"Hour ago: \n"
-        f" <b>{price_hour_safe}$</b>\n"
-        f" Difference: {change_h_safe}$\n\n"
-        f"Day ago: \n"
-        f" <b>{price_day_safe}$</b>\n"
-        f" Difference: {change_d_safe}$\n"
-        f"</blockquote>"
-    ) #сам текст, ничего сложного
-    
     return text
 
 def get_price_json(url, params):
